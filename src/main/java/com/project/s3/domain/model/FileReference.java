@@ -61,6 +61,10 @@ public class FileReference {
         this.temp = temp;
     }
 
+    public String getPath() {
+        return this.id + "/" + this.name;
+    }
+
     @Getter
     @AllArgsConstructor
     public enum Type {

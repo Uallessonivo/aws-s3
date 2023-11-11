@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/aw_ebook?createDatabaseIfNotExist=true&serverTimezone=UTC
+    username: root
+    password:
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+aw:
+  storage:
+    s3:
+      key-id: ${AWS_KEY_ID}
+      key-secret: ${AWS_KEY_SECRET}
+      bucket: ${AWS_BUCKET_NAME}
+      region: ${AWS_BUCKET_REGION}
