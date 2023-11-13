@@ -28,7 +28,7 @@ public class Ebook {
 
     private String title;
 
-    private String autor;
+    private String author;
 
     @OneToOne(cascade = CascadeType.ALL)
     private FileReference cover;
@@ -40,16 +40,16 @@ public class Ebook {
         // for hibernate
     }
 
-    public Ebook(UUID id, OffsetDateTime createdAt, String title, String autor, FileReference cover, FileReference attachment) {
+    public Ebook(UUID id, OffsetDateTime createdAt, String title, String author, FileReference cover, FileReference attachment) {
         Objects.requireNonNull(title);
-        Objects.requireNonNull(autor);
+        Objects.requireNonNull(author);
         Objects.requireNonNull(cover);
         Objects.requireNonNull(attachment);
 
         this.id = id;
         this.createdAt = createdAt;
         this.title = title;
-        this.autor = autor;
+        this.author = author;
         this.cover = cover;
         this.attachment = attachment;
     }
@@ -57,7 +57,7 @@ public class Ebook {
     public void update(Ebook ebookUpdated) {
         Objects.requireNonNull(ebookUpdated);
         this.title = ebookUpdated.title;
-        this.autor = ebookUpdated.autor;
+        this.author = ebookUpdated.author;
         this.cover = ebookUpdated.cover;
         this.attachment = ebookUpdated.attachment;
     }
