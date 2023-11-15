@@ -26,7 +26,7 @@ public class EbookService {
         }
 
         if (storageService.fileExists(ebook.getAttachment())) {
-            throw new BusinessExcpetion(String.format("file was not found: %s", ebook.getCover().getId()));
+            throw new BusinessExcpetion(String.format("file was not found: %s", ebook.getAttachment().getId()));
         }
 
         if (!FileReference.Type.IMAGE.equals(ebook.getCover().getType())) {
