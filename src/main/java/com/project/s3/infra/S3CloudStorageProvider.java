@@ -1,6 +1,7 @@
 package com.project.s3.infra;
 
 import com.project.s3.core.StorageProperties;
+import com.project.s3.domain.exception.StorageCloudException;
 import com.project.s3.domain.model.FileReference;
 import com.project.s3.domain.service.CloudStorageProvider;
 import lombok.AllArgsConstructor;
@@ -8,9 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.awscore.AwsRequestOverrideConfiguration;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
@@ -82,6 +81,40 @@ public class S3CloudStorageProvider implements CloudStorageProvider {
         } catch (NoSuchKeyException e) {
             log.warn(String.format("file not found: %s", path));
             return false;
+        }
+    }
+
+    @Override
+    public void moveFile(String path, String s) {
+        CopyObjectRequest copyObjectRequest = CopyObjectRequest.builder()
+                .sourceKey(path)
+                .destinationKey(s)
+                .sourceBucket(getBucket())
+                .destinationBucket(getBucket())
+                .build();
+
+        try {
+            s3Client.copyObject(copyObjectRequest);
+        } catch (Exception e) {
+            log.error(String.format("error moving file from %s to %s", path, s), e);
+            throw new StorageCloudException(String.format("error moving file from %s to %s", path, s));
+        }
+
+        removeFile(path);
+    }
+
+    @Override
+    public void removeFile(String fromPath) {
+        DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                .bucket(getBucket())
+                .key(fromPath)
+                .build();
+
+        try {
+            s3Client.deleteObject(deleteObjectRequest);
+        } catch (Exception e) {
+            log.error(String.format("error removing file %s", fromPath), e);
+            throw new StorageCloudException(String.format("error removing file %s", fromPath));
         }
     }
 

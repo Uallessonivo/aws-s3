@@ -19,6 +19,41 @@ public class EbookService {
 
     @Transactional
     public Ebook create(Ebook ebook) {
+        validate(ebook);
+
+        ebook.getCover().setTemp(false);
+        ebook.getAttachment().setTemp(false);
+
+        ebookRepository.save(ebook);
+
+        return ebook;
+    }
+
+    @Transactional
+    public Ebook update(Ebook ebookUpdated) {
+        validate(ebookUpdated);
+
+        Ebook existingEbook = ebookRepository.findById(ebookUpdated.getId())
+                .orElseThrow(EntityNotFoundException::new);
+
+        if (!ebookUpdated.getCover().equals(existingEbook.getCover())) {
+            ebookUpdated.getCover().setTemp(false);
+            this.storageService.softDelete(existingEbook.getCover());
+        }
+
+        if (!ebookUpdated.getAttachment().equals(existingEbook.getAttachment())) {
+            ebookUpdated.getAttachment().setTemp(false);
+            this.storageService.softDelete(existingEbook.getAttachment());
+        }
+
+        existingEbook.update(ebookUpdated);
+        ebookRepository.save(existingEbook);
+        ebookRepository.flush();
+
+        return existingEbook;
+    }
+
+    private void validate(Ebook ebook) {
         Objects.requireNonNull(ebook);
 
         if (storageService.fileExists(ebook.getCover())) {
@@ -36,26 +71,5 @@ public class EbookService {
         if (!FileReference.Type.DOCUMENT.equals(ebook.getAttachment().getType())) {
             throw new BusinessExcpetion(String.format("file is not an document: %s", ebook.getAttachment().getId()));
         }
-
-        ebook.getCover().setTemp(false);
-        ebook.getAttachment().setTemp(false);
-
-        ebookRepository.save(ebook);
-
-        return ebook;
-    }
-
-    @Transactional
-    public Ebook update(Ebook ebookUpdated) {
-        Objects.requireNonNull(ebookUpdated);
-
-        Ebook existingEbook = ebookRepository.findById(ebookUpdated.getId())
-                .orElseThrow(EntityNotFoundException::new);
-
-        existingEbook.update(ebookUpdated);
-        ebookRepository.save(existingEbook);
-        ebookRepository.flush();
-
-        return existingEbook;
     }
 }

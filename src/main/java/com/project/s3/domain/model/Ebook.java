@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Getter
 @Builder
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 public class Ebook {
 
@@ -21,6 +21,7 @@ public class Ebook {
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     @Column(name = "id", columnDefinition = "char(36)")
+    @EqualsAndHashCode.Include
     private UUID id;
 
     @CreationTimestamp
